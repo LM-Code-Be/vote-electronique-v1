@@ -1,4 +1,4 @@
-# Vote Electronique v1 (LM-Code)
+# Application de gestion de Vote Electronique (LM-Code)
 
 Application web de vote electronique orientee entreprise, developpee en PHP + MySQL, avec:
 
@@ -12,6 +12,7 @@ Developpeur: **Michael - LM-Code**
 Site: https://lm-code.be
 
 ---
+<img width="1917" height="939" alt="image" src="https://github.com/user-attachments/assets/5e3c4c2a-2ef7-4cf6-aa9d-f0c3158686e9" />
 
 ## Sommaire
 
