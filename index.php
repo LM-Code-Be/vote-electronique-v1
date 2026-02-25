@@ -23,3 +23,4 @@ if (user_is_logged_in()) {
 
 header('Location: ' . app_url('/enterprise/login.php'));
 exit;
+// Gestion single-tenant: point d'entree unique vers le portail enterprise.
