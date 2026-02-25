@@ -60,7 +60,14 @@ Site: https://lm-code.be
 
 ## Installation rapide
 
-### 1) Configurer l environnement
+### 1) Recuperer le projet
+
+```bash
+git clone https://github.com/LM-Code-Be/vote-electronique-v1.git
+cd vote-electronique-v1
+```
+
+### 2) Configurer l environnement
 
 ```bash
 cp .env.example .env
@@ -74,20 +81,28 @@ Renseigner au minimum:
 - `DB_USER`
 - `DB_PASS`
 
-### 2) Initialiser la base
+### 3) Creer la base de donnees
+
+Exemple MySQL:
+
+```sql
+CREATE DATABASE vote_electronique CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+### 4) Initialiser la base (migrations)
 
 ```bash
 php scripts/migrate.php up
 php scripts/migrate.php status
 ```
 
-### 3) Creer un compte de depart
+### 5) Creer un compte de depart
 
 ```bash
 php scripts/user_create.php --username=superadmin_lmcode --password=lm-code.be --roles=SUPERADMIN,ADMIN,SCRUTATEUR,VOTER --user_type=INTERNAL
 ```
 
-### 4) Ouvrir l application
+### 6) Ouvrir l application
 
 - Login: `/enterprise/login.php`
 - Portail: `/enterprise/elections.php`
@@ -176,4 +191,3 @@ Place tes images dans `assets/screenshots/` puis remplace les chemins ci-dessous
 - Le depot public conserve la doc essentielle: `README.md`
 - Les docs de travail internes (`TUTORIEL.md`, `SCENARIOS.md`, `test.md`, etc.) sont ignorees par Git
 - Le tutoriel complet est publie sur https://lm-code.be
-
