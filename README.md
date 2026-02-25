@@ -1,128 +1,166 @@
 # Vote Electronique v1 (LM-Code)
 
-Application de vote electronique orientee entreprise, en PHP + MySQL, avec portail votant et back-office admin.
+Application web de vote electronique orientee entreprise, developpee en PHP + MySQL, avec:
 
-Developpeur: **Michael (LM-Code)**  
-Site: https://lm-code.be
-
-## 1. Objectif
-
-Ce projet permet de gerer des scrutins internes/externe avec:
-
-- authentification obligatoire,
-- gestion des roles metier,
-- types de scrutin multiples,
-- emargement et suivi de participation,
-- resultats et audit,
+- portail votant,
+- back-office admin,
+- gestion des roles,
+- suivi de participation live,
 - notifications in-app et push navigateur.
 
-## 2. Stack technique
+Developpeur: **Michael - LM-Code**  
+Site: https://lm-code.be
 
-- PHP 8.x
-- MySQL / MariaDB
-- Apache (mod_rewrite)
-- Bootstrap 5 + AdminLTE
-- JavaScript natif + jQuery/DataTables
+---
 
-## 3. Fonctionnalites principales
+## Sommaire
 
-### 3.1 Scrutins
+1. [Fonctionnalites](#fonctionnalites)
+2. [Stack technique](#stack-technique)
+3. [Architecture](#architecture)
+4. [Installation rapide](#installation-rapide)
+5. [Roles et permissions](#roles-et-permissions)
+6. [Captures UI](#captures-ui)
+7. [Scripts utiles](#scripts-utiles)
+8. [Documentation](#documentation)
 
-- Types: `SINGLE`, `MULTI`, `YESNO`, `RANKED`
-- Audience: `INTERNAL`, `HYBRID`, `EXTERNAL`
-- Wizard de creation (infos, regles, eligibilite, resume)
-- Publication / cloture / archivage / duplication
-- Synchronisation des candidats
-- Verrouillage des regles critiques apres publication
+---
 
-### 3.2 Vote
+## Fonctionnalites
 
-- Controle d eligibilite par audience + role `VOTER` + emargement/groupes
-- Vote modifiable si autorise (hors vote anonyme)
-- Recu de vote
-- Prevention du double vote selon les regles
+- Types de scrutin: `SINGLE`, `MULTI`, `YESNO`, `RANKED`
+- Audiences: `INTERNAL`, `HYBRID`, `EXTERNAL`
+- Candidats lies a des utilisateurs existants
+- Creation rapide de candidats externes
+- Emargement (snapshot), participation, resultats, audit
+- Notifications admin + inbox utilisateur live
+- Cloture automatique des scrutins expires
 
-### 3.3 Participation et emargement
+---
 
-- Snapshot de la liste electorale (emargement)
-- Suivi participation en temps reel (mode live)
-- Export CSV
-- Derniers votes recus en direct
+## Stack technique
 
-### 3.4 Notifications
+- Backend: PHP 8.x
+- Base de donnees: MySQL / MariaDB
+- Frontend: Bootstrap 5, AdminLTE, JS natif, jQuery, DataTables
+- Architecture: Clean Architecture pragmatique (migration progressive)
 
-- Notifications admin (bannieres portail)
-- Inbox utilisateur in-app (badge + liste)
-- Push navigateur (si permission accordee)
-- Lien cible par notification
-- Evenements automatiques:
-  - scrutin publie
-  - scrutin cloture
-  - vote enregistre (notification personnelle)
+---
 
-### 3.5 Cloture automatique
+## Architecture
 
-Si un scrutin publie depasse sa date de fin, il est cloture automatiquement:
+- `src/Domain`: regles metier pures
+- `src/Application`: cas d usage / services applicatifs
+- `src/Infrastructure`: adaptateurs techniques (PDO, HTTP, composition)
+- `src/Controller` + `views`: interface web MVC
+- `api/ent-*.php`: endpoints JSON enterprise
+- `app/*.php`: facades legacy de compatibilite
 
-- a chaque acces portail,
-- a chaque appel API enterprise,
-- ou via script CLI `php scripts/close_elections.php`.
+---
 
-## 4. Roles et droits
+## Installation rapide
 
-### 4.1 SUPERADMIN
+### 1) Configurer l environnement
 
-- Acces portail votant
-- Acces admin complet
-- Audit, Roles et Sauvegardes reserves a ce role
-- Peut modifier/supprimer n importe quel scrutin
+```bash
+cp .env.example .env
+```
 
-### 4.2 ADMIN
+Renseigner au minimum:
 
-- Acces portail votant
-- Acces admin metier:
-  - dashboard, elections, emargement, resultats, participation
-  - utilisateurs, groupes, candidats, notifications
-- Pas d acces a `Audit`, `Roles`, `Sauvegardes`
-- Ne peut modifier un scrutin que s il en est le createur (ou SUPERADMIN)
+- `APP_BASE_PATH`
+- `DB_HOST`
+- `DB_NAME`
+- `DB_USER`
+- `DB_PASS`
 
-### 4.3 SCRUTATEUR
-
-- Acces portail votant
-- Acces supervision:
-  - dashboard, elections (lecture/suivi), emargement, resultats, participation
-- Pas d acces utilisateurs/groupes/candidats/notifications
-- Pas d acces audit
-
-### 4.4 VOTER
-
-- Acces portail votant uniquement:
-  - scrutins, resultats, profil
-
-## 5. Installation rapide
-
-1. Copier `.env.example` vers `.env`
-2. Configurer la base de donnees
-3. Executer les migrations
+### 2) Initialiser la base
 
 ```bash
 php scripts/migrate.php up
 php scripts/migrate.php status
 ```
 
-4. Creer un premier compte
+### 3) Creer un compte de depart
 
 ```bash
 php scripts/user_create.php --username=superadmin_lmcode --password=lm-code.be --roles=SUPERADMIN,ADMIN,SCRUTATEUR,VOTER --user_type=INTERNAL
 ```
 
-5. Ouvrir l application
+### 4) Ouvrir l application
 
 - Login: `/enterprise/login.php`
 - Portail: `/enterprise/elections.php`
 - Admin: `/enterprise/admin/dashboard.php`
 
-## 6. Scripts utiles
+---
+
+## Roles et permissions
+
+### SUPERADMIN
+
+- Acces total admin
+- Acces exclusif: `Audit`, `Roles`, `Sauvegardes`
+- Peut modifier/supprimer tous les scrutins
+
+### ADMIN
+
+- Acces admin metier (elections, users, groupes, candidats, notifications, etc.)
+- Pas d acces `Audit`, `Roles`, `Sauvegardes`
+- Peut modifier un scrutin seulement s il en est createur (sinon SUPERADMIN)
+
+### SCRUTATEUR
+
+- Acces supervision: dashboard, elections, emargement, participation, resultats
+- Pas d administration utilisateurs/groupes/candidats
+- Pas d acces audit
+
+### VOTER
+
+- Acces portail votant uniquement
+
+---
+
+## Captures UI
+
+Ce README est pret pour inserer des captures d ecran.
+Place tes images dans `assets/screenshots/` puis remplace les chemins ci-dessous.
+
+### Login
+
+![Login](assets/screenshots/login.png)
+
+### Dashboard admin
+
+![Dashboard](assets/screenshots/admin-dashboard.png)
+
+### Wizard creation election
+
+![Wizard election](assets/screenshots/admin-election-wizard.png)
+
+### Gestion candidats
+
+![Candidats](assets/screenshots/admin-candidates.png)
+
+### Participation live
+
+![Participation live](assets/screenshots/admin-participation-live.png)
+
+### Portail votant
+
+![Portail votant](assets/screenshots/portal-elections.png)
+
+### Notification in-app
+
+![Notifications](assets/screenshots/portal-notifications.png)
+
+### Resultats
+
+![Resultats](assets/screenshots/portal-results.png)
+
+---
+
+## Scripts utiles
 
 - `php scripts/migrate.php up`
 - `php scripts/migrate.php status`
@@ -131,33 +169,11 @@ php scripts/user_create.php --username=superadmin_lmcode --password=lm-code.be -
 - `php scripts/close_elections.php`
 - `php scripts/backup.php`
 
-## 7. Structure du projet
+---
 
-- `enterprise/` pages portail et admin
-- `api/ent-*.php` endpoints JSON enterprise
-- `app/` bootstrap et facades legacy
-- `src/Domain` regles metier
-- `src/Application` cas d usage
-- `src/Infrastructure` adaptateurs techniques
-- `src/Controller` + `views/` interface MVC
-- `assets/` JS/CSS/branding
-- `migrations/` schema SQL versionne
-- `scripts/` outils CLI
+## Documentation
 
-## 8. Clean Architecture (pragmatique)
-
-Le projet migre vers une clean architecture sans casser les routes existantes:
-
-- logique metier dans `src/Domain` + `src/Application`,
-- details techniques en peripherie (`src/Infrastructure`),
-- compatibilite legacy conservee via `app/*.php`.
-
-## 9. Documentation publiee
-
-Le depot public conserve volontairement une doc minimale:
-
-- `README.md` versionne,
-- autres documents de travail (`*.md`) ignores via `.gitignore`.
-
-Le tutoriel complet est publie sur **lm-code.be**.
+- Le depot public conserve la doc essentielle: `README.md`
+- Les docs de travail internes (`TUTORIEL.md`, `SCENARIOS.md`, `test.md`, etc.) sont ignorees par Git
+- Le tutoriel complet est publie sur https://lm-code.be
 
