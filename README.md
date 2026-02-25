@@ -193,4 +193,4 @@ Place tes images dans `assets/screenshots/` puis remplace les chemins ci-dessous
 - Découvrez nos articles et tutoriels complet sur https://lm-code.be
 
 Le tutoriel complet est disponible ici :  
-👉 **[Le tutoriel complet]([https://lm-code.be](https://lm-code.be/vote-electronique-php-mysql-tutoriel-complet/))**
+👉 **[Le tutoriel complet](https://lm-code.be/vote-electronique-php-mysql-tutoriel-complet/)**
