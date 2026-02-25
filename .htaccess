@@ -1,0 +1,32 @@
+# Sécurité minimale
+Options -Indexes
+
+AddDefaultCharset UTF-8
+<IfModule mod_mime.c>
+AddCharset UTF-8 .css .js .json .svg .txt
+</IfModule>
+
+<IfModule mod_headers.c>
+Header set X-Content-Type-Options "nosniff"
+Header set Referrer-Policy "same-origin"
+Header set X-Frame-Options "DENY"
+</IfModule>
+
+# Bloquer fichiers sensibles (si exposés)
+<FilesMatch "^\\.">
+    Require all denied
+</FilesMatch>
+<Files ".env">
+    Require all denied
+</Files>
+
+# Pretty URLs API : /api/foo => api/foo.php
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# Bloquer dossiers internes (non destinés au web)
+RewriteRule ^(app|src|views|migrations|scripts)/ - [F,L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^api/([A-Za-z0-9_-]+)/?$ api/$1.php [L,QSA]
+</IfModule>

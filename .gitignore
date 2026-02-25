@@ -1,0 +1,13 @@
+.env
+AGENTS.md
+
+# Uploads (garder la config)
+uploads/*
+!uploads/.htaccess
+!uploads/.gitkeep
+
+backups/*
+
+# Documentation (non publiee sur GitHub)
+*.md
+!/README.md
